@@ -17,6 +17,8 @@ nlp = spacy.load("en_core_web_sm")
 positive_items = []
 negative_items = []
 
+print("Hello World")
+
 with open("./dataset/2011Tornado_Summary.csv", "r", encoding="utf-8") as file:
     file.readline()
     for l in csv.reader(file, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL):
@@ -68,7 +70,7 @@ class BVHDataset(Dataset):
 num_epochs = 19
 batch_size = 1
 
-load_model = True
+load_model = False
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 embedding_model = gensim.downloader.load('glove-wiki-gigaword-300')
 
@@ -88,7 +90,7 @@ decoder = Decoder(hidden_size).to(device)
 model = EncoderFC(encoder, decoder, hidden_size, device).to(device)
 model_name = "./model_test.pt"
 
-loss_fn = nn.CrossEntropyLoss().to(device).float()
+loss_fn = nn.CrossEntropyLoss().to(device)
 
 optimiser = optim.Adam(model.parameters(), lr=0.001)
 '''
@@ -131,9 +133,11 @@ for epoch in range(num_epochs):
         target = torch.tensor(target, dtype=torch.int64)
         #target = target.type(torch.IntTensor)
         target = target.to(device)
-
-        loss = loss_fn(yhat, target)
-
+        print(yhat.size())
+        print(target.size())
+        loss = loss_fn(yhat.squeeze(0), target)
+        print(loss)
+        loss.requires_grad = True
         loss.backward()
         optimiser.step()
 
