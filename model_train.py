@@ -81,6 +81,7 @@ p, n = tweet_reader("./dataset/2013Floods_Summary.csv")
 positive_items += p
 negative_items += n
 
+
 diff = abs(len(positive_items) - len(negative_items))
 
 if len(positive_items) > len(negative_items):
@@ -112,7 +113,7 @@ class BVHDataset(Dataset):
 num_epochs = 29
 batch_size = 1
 
-load_model = True
+load_model = False
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 embedding_model = gensim.downloader.load('glove-wiki-gigaword-300')
 
@@ -128,9 +129,11 @@ encoder = Encoder(embedding_model, hidden_size, num_layers, encoder_dropout, dev
 decoder = Decoder(hidden_size).to(device)
 
 model = EncoderFC(encoder, decoder, hidden_size, device).to(device)
+
 model_name = "./model_test1.pt"
 
 loss_fn = nn.BCEWithLogitsLoss().to(device)
+
 
 optimiser = optim.Adam(model.parameters(), lr=0.0001)
 
@@ -152,10 +155,8 @@ for epoch in range(num_epochs):
         target = torch.tensor(target).float()
         # target = target.type(torch.IntTensor)
         target = target.to(device)
-        # print(yhat)
-        # print(target)
+
         loss = loss_fn(yhat, target)
-        # print(loss)
         loss.backward()
         optimiser.step()
 
