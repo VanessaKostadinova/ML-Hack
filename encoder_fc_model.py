@@ -52,7 +52,8 @@ class Decoder(nn.Module):
         x = self.fc_1(x)
         prediction = self.fc_out(x)
         prediction = prediction.squeeze(0)
-        prediction = prediction.to(torch.int64)
+        prediction = prediction.squeeze(0)
+        #prediction = F.hardtanh(prediction, 0, 1)
         return prediction
 
 
@@ -86,5 +87,5 @@ class EncoderFC(nn.Module):
             enc_o, enc_h = self.encoder(input_words[index], enc_h)
 
         prediction = self.decoder(enc_o)
-        prediction = prediction.squeeze(0)
+        prediction = F.sigmoid(prediction)
         return prediction
